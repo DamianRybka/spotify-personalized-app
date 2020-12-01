@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="fragments :: styleLinks" th:remove="tag"></th:block>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<th:block th:replace="fragments :: navigator" th:remove="tag"></th:block>
+
+<div class="content-container">
+    <h1>Track search</h1>
+    <div class="row col-md-12 bordered">
+        <form class="row col-md-12" th:action="@{/search/tracks}" method="get">
+            <div class="offset-2 col-2">Search</div>
+            <div class="col-2">
+                <input class="form-control" type="text" name="q">
+            </div>
+            <div class="col-2">
+                <button class="form-control btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    <h1 th:if="${tracks != null}">Track list</h1>
+    <div th:if="${tracks != null}" class="row col-md-12">
+        <div class="row col-md-12 list-header-row">
+            <div class="col-2">Id</div>
+            <div class="col-1">Name</div>
+            <div class="col-1">Popularity</div>
+            <div class="col-1">Artists</div>
+            <div class="col-1">Duration</div>
+            <div class="col-1">Type</div>
+            <div class="col-1">Spotify link</div>
+            <div class="col-1">Favourites</div>
+            <div class="col-2"><!--Buttons--></div>
+        </div>
+        <div th:each="track : ${tracks.getItems()}" class="row col-md-12 list-data-row" th:th:classappend="${favourites.contains(track.getId())} ? 'favourite' : ''">
+            <div class="col-2" th:text="${track.getId()}"></div>
+            <div class="col-1" th:text="${track.getName()}"></div>
+            <div class="col-1" th:text="${track.getPopularity()}"></div>
+            <div class="col-1" th:text="${track.getArtistsString()}"></div>
+            <div class="col-1" th:text="${track.getDurationMs()}"></div>
+            <div class="col-1" th:text="${track.getType()}"></div>
+            <div class="col-1" th:text="${track.getExternalUrls().getSpotify()}"></div>
+            <div class="col-1"><!--TODO:--></div>
+            <div class="row col-2">
+                <form th:action="@{/search/addfavourite}" method="post">
+                    <input type="hidden" name="q" th:value="${q}">
+                    <input type="hidden" name="id" th:value="${track.getId()}"/>
+                    <input type="hidden" name="name" th:value="${track.getName()}"/>
+                    <input type="hidden" name="popularity" th:value="${track.getPopularity()}"/>
+                    <input type="hidden" name="durationMs" th:value="${track.getDurationMs()}"/>
+                    <input type="hidden" name="type" th:value="${track.getType()}"/>
+                    <input type="submit">
+                </form>
+                <!--<div class="col-6" th:if="${task.getTodoTaskStatus().name() == 'DONE'}">-->
+                <!--<a th:href="@{/task/setArchived(taskId=${task.getId()})}">-->
+                <!--<button type="button" class="btn btn-primary">-->
+                <!--Archive-->
+                <!--</button>-->
+                <!--</a>-->
+                <!--</div>-->
+            </div>
+        </div>
+        <div class="row col-md-12 info-row">
+            <div class="col-3">Total results:</div>
+            <div class="col-3" th:text="${tracks.getTotal()}"></div>
+        </div>
+        <div class="row col-md-12 info-row">
+            <div class="col-3">Current page:</div>
+            <div class="col-3"
+                 th:text="${(((tracks.getOffset()+tracks.getLimit())/tracks.getLimit()) + '/' + (tracks.getTotal()/tracks.getLimit()))}"></div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments :: footer" th:remove="tag"></th:block>
+<th:block th:replace="fragments :: jsScripts" th:remove="tag"></th:block>
+</body>
+</html>
